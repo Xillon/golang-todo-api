@@ -1,6 +1,7 @@
 package main
-import "fmt"
 
-func main()  {
-	fmt.Println("Hello, World!");
+import "github.com/Xillon/golang-todo-api/cmd"
+
+func main() {
+	cmd.Execute()
 }
