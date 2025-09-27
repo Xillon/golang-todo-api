@@ -1,22 +1,21 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/Xillon/golang-todo-api/handlers"
+	"github.com/Xillon/golang-todo-api/persistance"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"go.uber.org/fx"
 )
 
-// apiCmd represents the api command
 var apiCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Start the To Do API server",
-	Long: `This command starts the To Do API server which allows you to manage your tasks. 
-	It contains endpoints for creating, reading, updating, and deleting tasks.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("starting To Do API server...")
+		fmt.Println("Starting To Do API server...")
+		startApiServer()
 	},
 }
 
@@ -25,4 +24,26 @@ func init() {
 }
 
 func startApiServer() {
+	app := fx.New(
+
+		fx.Provide(
+			persistance.ProvideDatabase,
+			handlers.ProvideTodoHandler,
+		),
+
+		fx.Invoke(func(handler *handlers.TodoHandler) {
+			r := gin.Default()
+
+			r.POST("/todos", handler.AddTodos)
+			r.PATCH("/todos", handler.UpdateTodos)
+			r.GET("/todos", handler.GetTodos)
+
+			fmt.Println("API server is running on http://localhost:8080")
+			if err := r.Run(":8080"); err != nil {
+				fmt.Printf("Failed to run server: %v\n", err)
+			}
+		}),
+	)
+
+	app.Run()
 }
