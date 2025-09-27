@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Xillon/golang-todo-api/handlers"
-	"github.com/Xillon/golang-todo-api/persistance"
+	"github.com/Xillon/golang-todo-api/http"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
@@ -25,13 +24,8 @@ func init() {
 
 func startApiServer() {
 	app := fx.New(
-
-		fx.Provide(
-			persistance.ProvideDatabase,
-			handlers.ProvideTodoHandler,
-		),
-
-		fx.Invoke(func(handler *handlers.TodoHandler) {
+		FxModules,
+		fx.Invoke(func(handler *http.TodoHandler) {
 			r := gin.Default()
 
 			r.POST("/todos", handler.AddTodos)

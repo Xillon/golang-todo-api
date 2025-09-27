@@ -1,4 +1,4 @@
-package persistance
+package repository
 
 import (
 	"fmt"
@@ -13,12 +13,11 @@ import (
 
 var Database *gorm.DB
 
-// ProvideDatabase is an Uber-Fx constructor for the database connection
 func ProvideDatabase() (*gorm.DB, error) {
-	// Prompt the user for database type (MySQL or SQLite)
+
 	dbType := os.Getenv("DB_TYPE")
 	if dbType == "" {
-		dbType = "sqlite" // Default to SQLite
+		dbType = "sqlite"
 	}
 
 	var dsn string
@@ -26,7 +25,6 @@ func ProvideDatabase() (*gorm.DB, error) {
 	var err error
 
 	if dbType == "mysql" {
-		// MySQL configuration
 		username := os.Getenv("DB_USER")
 		password := os.Getenv("DB_PASS")
 		host := os.Getenv("DB_HOST")
@@ -36,7 +34,6 @@ func ProvideDatabase() (*gorm.DB, error) {
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, port, database)
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	} else {
-		// SQLite configuration
 		fmt.Println("Using SQLite as the default database...")
 		dsn = "todo.db"
 		db, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
