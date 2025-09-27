@@ -17,7 +17,7 @@ func ProvideDatabase() (*gorm.DB, error) {
 
 	dbType := os.Getenv("DB_TYPE")
 	if dbType == "" {
-		dbType = "sqlite"
+		dbType = "mysql"
 	}
 
 	var dsn string
