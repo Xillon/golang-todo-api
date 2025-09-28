@@ -28,7 +28,7 @@ func init() {
 
 func runMigrations() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("Error loading .env file: %v", err)
+		log.Printf("Error loading .env file: %v", err)
 	}
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
