@@ -31,6 +31,7 @@ func startApiServer() {
 			r.POST("/todos", handler.AddTodos)
 			r.PATCH("/todos", handler.UpdateTodos)
 			r.GET("/todos", handler.GetTodos)
+			r.DELETE("/todos/:id", handler.DeleteTodoById)
 
 			fmt.Println("API server is running on http://localhost:8080")
 			if err := r.Run(":8080"); err != nil {

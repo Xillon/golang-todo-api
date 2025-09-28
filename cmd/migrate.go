@@ -28,14 +28,14 @@ func init() {
 
 func runMigrations() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Println("Error loading .env file: %v", err)
 	}
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
-		log.Fatal("DB_DSN environment variable is not set")
+		log.Println("DB_DSN environment variable is not set")
 	}
 
-	migrationsPath := "file://migrations"
+	migrationsPath := "file://repository/migrations"
 	fmt.Printf("Running migrations from path: %s\n", migrationsPath)
 
 	m, err := migrate.New(migrationsPath, dsn)

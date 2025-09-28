@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -76,4 +77,20 @@ func (h *TodoHandler) GetTodos(c *gin.Context) {
 			"total": total,
 		},
 	})
+}
+
+func (h *TodoHandler) DeleteTodoById(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Id is required"})
+		return
+	}
+
+	if err := h.DB.Delete(&models.Todo{}, id).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Todo with id %s deleted successfully", id)})
 }
