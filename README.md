@@ -66,19 +66,6 @@ When running inside Docker, the container executes `./main api`, which is the sa
 
 ## Environment Variables
 
-| Name         | Description                            | Default |
-|--------------|----------------------------------------|---------|
-| `DB_TYPE`    | `mysql` or `sqlite`                    | `mysql` |
-| `DB_HOST`    | MySQL host                             | none    |
-| `DB_PORT`    | MySQL port                             | none    |
-| `DB_USER`    | MySQL user name                        | none    |
-| `DB_PASS`    | MySQL password                         | none    |
-| `DB_PASSWORD`| Optional alias for the password        | none    |
-| `DB_NAME`    | Database name                          | none    |
-| `DB_DSN`     | Used by the `migrate` command          | none    |
-
-Example `.env`:
-
 ```
 DB_TYPE=mysql
 DB_HOST=localhost
