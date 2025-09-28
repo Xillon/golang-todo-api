@@ -18,6 +18,17 @@ func ProvideTodoHandler(db *gorm.DB) *TodoHandler {
 	return &TodoHandler{DB: db}
 }
 
+// AddTodos godoc
+// @Summary      Add a list of todos
+// @Description  Creates one or more todos
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        X-API-Key  header  string  true  "API key"
+// @Param        request    body    map[string][]models.Todo  true  "Todos payload"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]string
+// @Router       /todos [post]
 func (h *TodoHandler) AddTodos(c *gin.Context) {
 	var request struct {
 		Todos []models.Todo `json:"todos"`
@@ -38,6 +49,17 @@ func (h *TodoHandler) AddTodos(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"todos": request.Todos})
 }
 
+// UpdateTodos godoc
+// @Summary      Update a list of todos
+// @Description  Updates one or more todos by id
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        X-API-Key  header  string  true  "API key"
+// @Param        request    body    map[string][]models.Todo  true  "Todos payload"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]string
+// @Router       /todos [patch]
 func (h *TodoHandler) UpdateTodos(c *gin.Context) {
 	var request struct {
 		Todos []models.Todo `json:"todos"`
@@ -58,6 +80,16 @@ func (h *TodoHandler) UpdateTodos(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"todos": request.Todos})
 }
 
+// GetTodos godoc
+// @Summary      List todos
+// @Description  Returns a paginated list of todos
+// @Tags         todos
+// @Produce      json
+// @Param        X-API-Key  header  string  true  "API key"
+// @Param        page       query   int     false "Page number"  default(1)
+// @Param        limit      query   int     false "Items per page"  default(10)
+// @Success      200  {object}  map[string]interface{}
+// @Router       /todos [get]
 func (h *TodoHandler) GetTodos(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -79,6 +111,14 @@ func (h *TodoHandler) GetTodos(c *gin.Context) {
 	})
 }
 
+// DeleteTodoById godoc
+// @Summary      Delete todo by ID
+// @Tags         todos
+// @Param        X-API-Key  header  string  true  "API key"
+// @Param        id         path    int     true "Todo ID"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  map[string]string
+// @Router       /todos/{id} [delete]
 func (h *TodoHandler) DeleteTodoById(c *gin.Context) {
 	id := c.Param("id")
 

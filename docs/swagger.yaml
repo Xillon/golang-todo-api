@@ -1,0 +1,155 @@
+definitions:
+  models.Todo:
+    properties:
+      complete:
+        type: boolean
+      created_at:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /todos:
+    get:
+      description: Returns a paginated list of todos
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List todos
+      tags:
+      - todos
+    patch:
+      consumes:
+      - application/json
+      description: Updates one or more todos by id
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Todos payload
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties:
+            items:
+              $ref: '#/definitions/models.Todo'
+            type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a list of todos
+      tags:
+      - todos
+    post:
+      consumes:
+      - application/json
+      description: Creates one or more todos
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Todos payload
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties:
+            items:
+              $ref: '#/definitions/models.Todo'
+            type: array
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a list of todos
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete todo by ID
+      tags:
+      - todos
+swagger: "2.0"

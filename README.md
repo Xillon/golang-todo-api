@@ -69,13 +69,24 @@ DB_TYPE=mysql
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASS=password
-DB_PASSWORD=password
+DB_PASS=admin
+DB_PASSWORD=admin
 DB_NAME=todo_db
-DB_DSN=mysql://root:password@tcp(localhost:3306)/todo_db?parseTime=true&loc=Local
+DB_DSN=mysql://root:admin@tcp(localhost:3306)/todo_db?parseTime=true&loc=Local
+API_KEY=h3@rXAp1K3Y
 ```
 
 ## API Overview
+
+### Authentication
+
+All endpoints expect an API key. Set the `API_KEY` environment variable on the server and send it with every request using the `X-API-Key` header.
+
+```
+X-API-Key: supersecret
+```
+
+If `API_KEY` is unset, the server logs a warning and skips the check for testing.
 
 ### POST /todos
 
@@ -163,6 +174,17 @@ The `migrate` command expects `DB_DSN` (e.g. `mysql://user:pass@tcp(host:port)/d
 - **Port 3306 already in use**: stop the existing MySQL service or change the compose mapping and `DB_PORT`.
 - **Access denied**: verify the MySQL user/password and update both `DB_PASS` and `DB_DSN`.
 - **Docker Desktop + WSL issues**: restarting `wsl --shutdown` and re-opening Docker Desktop usually clears the error; ensure WSL distros are initialized.
+
+## Challenges we hit
+
+- **Env var mismatches (MySQL)**: Code expected `DB_PASS` and `DB_TYPE=mysql`, compose used different names or omitted `DB_TYPE`. We standardized on `DB_PASS` and added `DB_TYPE=mysql`; ensured `DB_DSN` matches the same credentials for the migrate command.
+- **API didn’t read `.env` automatically**: Only the `migrate` command loaded `.env`. For the API, we exported vars in the shell (or you can add `godotenv.Load()` to the server startup if desired).
+- **SQLite build error on Windows (CGO)**: `go-sqlite3` needs CGO. Workarounds: run with MySQL (preferred) or use the pure Go driver `github.com/glebarez/sqlite` in tests.
+- **Migrations path**: SQL files live under `repository/migrations`. We pointed the migrate command at `file://repository/migrations` to match the layout.
+- **Port 3306 conflicts**: A local `mysqld.exe` was already bound to 3306. We either stopped that service or mapped compose to `3307:3306` and set `DB_PORT=3307`.
+- **WSL / Docker Desktop issues**: Fixed by `wsl --shutdown`, restarting Docker Desktop, or reinstalling the Ubuntu WSL distro if the `ext4.vhdx` was missing.
+- **Test import cycles**: Resolved by using external test package naming (`package http_test`), which breaks circular imports.
+- **Test data collisions (unique titles)**: Seeding with the same title hit unique constraints. We switched to unique seed titles and truncated the in-memory table in the test setup helper.
 
 ## Next Steps
 

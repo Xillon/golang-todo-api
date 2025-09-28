@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var Database *gorm.DB
@@ -28,10 +31,29 @@ func ProvideDatabase() (*gorm.DB, error) {
 		username := os.Getenv("DB_USER")
 		password := os.Getenv("DB_PASS")
 		host := os.Getenv("DB_HOST")
+		if host == "" {
+			host = "127.0.0.1"
+		}
 		port := os.Getenv("DB_PORT")
+		if port == "" {
+			port = "3306"
+		}
 		database := os.Getenv("DB_NAME")
 
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, port, database)
+		serverDSN := fmt.Sprintf("%s:%s@tcp(%s:%s)/?parseTime=true&multiStatements=true&charset=utf8mb4&collation=utf8mb4_unicode_ci", username, password, host, port)
+		sqlDB, errOpen := sql.Open("mysql", serverDSN)
+
+		if errOpen != nil {
+			return nil, fmt.Errorf("failed to open mysql server connection: %w", errOpen)
+		}
+
+		defer sqlDB.Close()
+
+		if _, errExec := sqlDB.Exec("CREATE DATABASE IF NOT EXISTS `" + database + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"); errExec != nil {
+			return nil, fmt.Errorf("failed to create database %s: %w", database, errExec)
+		}
+
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local&charset=utf8mb4&collation=utf8mb4_unicode_ci", username, password, host, port, database)
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	} else {
 		fmt.Println("Using SQLite as the default database...")
