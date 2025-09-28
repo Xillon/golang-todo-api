@@ -1,6 +1,6 @@
 # Go Todo API
 
-A simple Todo REST API written in Go with Gin, GORM, Cobra, and Uber Fx. The service exposes batch create, update, and list endpoints and persists data in MySQL (SQLite fallback is available for quick tests).
+ Todo REST API written in Go with Gin, GORM, Cobra, and Uber Fx. The service exposes batch create, update, and list endpoints and persists data in MySQL (SQLite fallback is available for quick tests).
 
 ## Features
 
@@ -50,19 +50,17 @@ docker compose down
    go run . api
    ```
 
-   (Use the equivalent `source` command on macOS/Linux.)
-
-If you prefer SQLite, set `DB_TYPE=sqlite` and install a C toolchain so `go-sqlite3` can compile (CGO must be enabled).
+If you prefer SQLite, set `DB_TYPE=sqlite`
 
 ## CLI Commands (Cobra)
 
 ```bash
 go run . --help
-go run . api       # start the HTTP server
-go run . migrate   # apply SQL migrations via golang-migrate
+go run . api
+go run . migrate
 ```
 
-When running inside Docker, the container executes `./main api`, which is the same as the first command above.
+When running inside Docker, the container executes `./main api`.
 
 ## Environment Variables
 
@@ -114,6 +112,14 @@ curl -X PATCH http://localhost:8080/todos \
       }'
 ```
 
+### DELETE /todos/:id
+
+Delete a todo by ID.
+
+```bash
+curl -X DELETE http://localhost:8080/todos/1
+```
+
 ### GET /todos
 
 List todos with pagination.
@@ -149,11 +155,6 @@ Response structure:
 
 To apply MySQL migrations from the host:
 
-```bash
-export $(cat .env | xargs)   # or PowerShell equivalent
-go run . migrate
-```
-
 The `migrate` command expects `DB_DSN` (e.g. `mysql://user:pass@tcp(host:port)/db?parseTime=true&loc=Local`).
 
 ## Troubleshooting
@@ -165,11 +166,10 @@ The `migrate` command expects `DB_DSN` (e.g. `mysql://user:pass@tcp(host:port)/d
 
 ## Next Steps
 
-- Add DELETE and GET-by-ID routes
+- Add and GET-by-ID routes
 - Add unit/integration tests and wire a CI workflow
 - Improve validation and error handling (e.g., handle duplicate titles gracefully)
 - Harden configuration (structured logging, graceful shutdown, CORS, health checks)
 
-Enjoy building on the Todo API!
 
 
