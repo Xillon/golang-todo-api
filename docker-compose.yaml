@@ -14,6 +14,7 @@ services:
       - DB_USER=root
       - DB_PASS=password
       - DB_NAME=todo_db
+      - API_KEY=h3@rXAp1K3Y
 
   db:
     image: mysql:8.0
