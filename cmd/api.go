@@ -20,7 +20,9 @@ var apiCmd = &cobra.Command{
 	Short: "Start the To Do API server",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Starting To Do API server...")
-		godotenv.Load()
+		if err := godotenv.Load(); err != nil {
+			_ = godotenv.Load(".env.example")
+		}
 		startApiServer()
 	},
 }
@@ -44,8 +46,13 @@ func startApiServer() {
 			r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 			apiKey := os.Getenv("API_KEY")
-			if apiKey == "" {
-				log.Println("warning: API_KEY not set; requests will not be authenticated")
+			requireKey := os.Getenv("REQUIRE_API_KEY")
+
+			if apiKey == "" && requireKey == "true" {
+				log.Println("fatal: API_KEY not set but REQUIRE_API_KEY=true; refusing to start")
+				panic("API_KEY required but not provided")
+			} else if apiKey == "" {
+				log.Println("warning: API_KEY not set; requests will not be authenticated (set REQUIRE_API_KEY=true to enforce)")
 			}
 
 			secured := r.Group("/")
@@ -55,6 +62,7 @@ func startApiServer() {
 
 			secured.POST("/todos", handler.AddTodos)
 			secured.PATCH("/todos", handler.UpdateTodos)
+			secured.PATCH("/todos/mark-all-as-done", handler.MarkAllAsDone)
 			secured.GET("/todos", handler.GetTodos)
 			secured.DELETE("/todos/:id", handler.DeleteTodoById)
 

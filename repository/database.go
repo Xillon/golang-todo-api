@@ -65,9 +65,10 @@ func ProvideDatabase() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// Auto-migrate the Todo model
-	if err := db.AutoMigrate(&models.Todo{}); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
+	if os.Getenv("DB_AUTOMIGRATE") == "true" {
+		if err := db.AutoMigrate(&models.Todo{}); err != nil {
+			log.Fatalf("Failed to migrate database: %v", err)
+		}
 	}
 
 	log.Println("Database connected and migrated successfully!")

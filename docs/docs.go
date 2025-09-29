@@ -169,6 +169,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/todos/mark-all-as-done": {
+            "patch": {
+                "tags": [
+                    "todos"
+                ],
+                "summary": "Mark all todos as done",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/todos/{id}": {
             "delete": {
                 "tags": [

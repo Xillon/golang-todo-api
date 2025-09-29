@@ -152,4 +152,28 @@ paths:
       summary: Delete todo by ID
       tags:
       - todos
+  /todos/mark-all-as-done:
+    patch:
+      parameters:
+      - description: API key
+        in: header
+        name: X-API-Key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Mark all todos as done
+      tags:
+      - todos
 swagger: "2.0"

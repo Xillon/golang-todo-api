@@ -69,11 +69,12 @@ DB_TYPE=mysql
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASS=admin
-DB_PASSWORD=admin
+DB_PASS=password
 DB_NAME=todo_db
-DB_DSN=mysql://root:admin@tcp(localhost:3306)/todo_db?parseTime=true&loc=Local
+DB_DSN=mysql://root:password@tcp(localhost:3306)/todo_db?parseTime=true&loc=Local
 API_KEY=h3@rXAp1K3Y
+REQUIRE_API_KEY=true
+DB_AUTOMIGRATE=false
 ```
 
 ## API Overview

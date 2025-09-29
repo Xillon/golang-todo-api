@@ -42,6 +42,41 @@ func TestAddTodos(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rec.Code)
 }
 
+func TestAddTodosValidationErrors(t *testing.T) {
+	router, _ := helpers.SetupRouterWithSQLite(t)
+
+	payload := map[string][]models.Todo{"todos": {}}
+	jsonPayload, _ := json.Marshal(payload)
+
+	req, _ := http.NewRequest(http.MethodPost, "/todos", bytes.NewReader(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+
+	payload = map[string][]models.Todo{"todos": {{Description: "no title"}}}
+	jsonPayload, _ = json.Marshal(payload)
+	req, _ = http.NewRequest(http.MethodPost, "/todos", bytes.NewReader(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
+
+func TestAddTodosDuplicateTitle(t *testing.T) {
+	router, db := helpers.SetupRouterWithSQLite(t)
+	helpers.SeedTodos(t, db, models.Todo{Title: "dupe"})
+
+	payload := map[string][]models.Todo{"todos": {{Title: "dupe"}}}
+	jsonPayload, _ := json.Marshal(payload)
+
+	req, _ := http.NewRequest(http.MethodPost, "/todos", bytes.NewReader(jsonPayload))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	assert.Equal(t, http.StatusConflict, rec.Code)
+}
+
 func TestUpdateTodos(t *testing.T) {
 	router, db := helpers.SetupRouterWithSQLite(t)
 	seeded := helpers.SeedTodos(t, db, models.Todo{Title: "Seed update", Description: "Original"})

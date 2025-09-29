@@ -24,5 +24,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		_ = godotenv.Load(".env.example")
+	}
 }

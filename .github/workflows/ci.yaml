@@ -9,8 +9,29 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: todo_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -ppassword -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     env:
       GO_VERSION: '1.25.1'
+      DB_TYPE: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: password
+      DB_NAME: todo_db
+      DB_AUTOMIGRATE: "true"
+      DB_DSN: mysql://root:password@tcp(127.0.0.1:3306)/todo_db?parseTime=true&loc=Local
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,6 +53,22 @@ jobs:
 
       - name: Tidy deps
         run: go mod tidy
+
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -ppassword 2>/dev/null; then
+              echo "MySQL is up"; break
+            fi
+            echo "Waiting for MySQL..."; sleep 2
+          done
+        shell: bash
+
+      - name: Run migrations
+        run: go run . migrate
 
       - name: Run tests (race + coverage)
         run: go test -v -race -covermode=atomic -coverprofile=coverage.txt ./...
